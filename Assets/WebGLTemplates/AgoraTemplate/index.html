@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <!-- Unity HTMLテンプレート  -->
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Unity WebGL Player | %UNITY_WEB_NAME%</title>
+  <script src="%UNITY_WEBGL_LOADER_URL%"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.1.1.js"></script> 
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.3/react-dom.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+  <script src="agora.js"></script>
+  <script>
+    var gameInstance = UnityLoader.instantiate("gameContainer","%UNITY_WEBGL_BUILD_URL%");
+  </script>
+  <link rel="stylesheet" type="text/css" href="common.css">
+
+</head>
+<body class="agora-theme">
+  <div id="gameContainer" style="width: %UNITY_WIDTH%px; height: %UNITY_HEIGHT%px; margin: auto"></div>
+  
+  
+  <!-- <div class="row" style="margin: 0">
+    <div class="col s12">
+      <button class="btn btn-raised btn-primary waves-effect waves-light" id="join">JOIN</button>
+      <button class="btn btn-raised btn-primary waves-effect waves-light" id="leave">LEAVE</button>
+    </div> -->
+  </div>
+  <div class="col s7">
+    <div class="video-grid" id="video">
+      <div class="video-view">
+        <div id="local_stream" class="video-placeholder"></div>
+        <div id="local_video_info" class="video-profile hide"></div>
+        <div id="video_autoplay_local" class="autoplay-fallback hide"></div>
+      </div>
+    </div>
+  </div>
+  <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.1.1.js"></script> -->
+</body>
+</html>
