@@ -14,10 +14,10 @@ public class joinButton : MonoBehaviour
         users.Add("山本太郎", 2);
         users.Add("鈴木太郎", 3);
 
-        string member = "たろう,120_はなこ,412"; //_たなか,3310";
+        string member = "たろう,120_はなこ,412_やまだ,125_はなの,410_たろ,122_はな,41_たろ,122_はなし,4_たろこ,1222_はなみ,400"; //_たなか,3310";
 
         int channel = 125;
-        string uid = "120";
+        string uid = "400";
         string camera = "default";
 
         agora a = new agora();

@@ -398,6 +398,7 @@ function leave (rtc) {
         stream.stop()
       }
       removeView(id)
+      $("#text_"+String(id)).remove();
     }
     rtc.localStream = null
     rtc.remoteStreams = []
@@ -493,7 +494,7 @@ function numberCSS(id, num){
     color = "#affaaf";
   }
 
-  var text = String(number)+" | "+ShiritoriUsers[String(id)];
+  var text = String(number)+" | "+ShiritoriUsers[String(id)].name;
   resize = screenInfo(num);
   $("#text_"+String(id)).css({
     "position": "absolute",
@@ -525,67 +526,13 @@ function operationNumber(state, id, num=""){
     case "make":
       var newDiv = document.createElement("div"); 
       newDiv.id = "text_"+String(id);
-      //newDiv.textContent = String(num);
       document.body.appendChild(newDiv);
       document.getElementById("text_"+String(id)).textContent = numberCSS(id, num);
-      // $("#text_"+String(id)).css({
-      //   "position": "absolute",
-      //   "z-index": "2",
-      //   "font-weight": "bold",
-      //   "text-align" : "left",
-      //   "top": String(resize.top*2+resize.height-25)+"px",
-      //   "left":String(resize.left*2+10)+"px",
-      //   "width": String(resize.width-20)+"px",
-      //   "height": "25px"
-      // });
-      // if(num == 0){
-      //   $("#text_"+String(id)).css({
-      //     "width": "",
-      //     "border-left": "",
-      //     "border-right": "",
-      //     "border-top": "",
-      //     "border-bottom": ""
-      //   });
-      // }else if(num == 1){
-      //   $("#text_"+String(id)).css({
-      //     "background" : "white",
-      //     "border-top": "dashed 2px  #fffacc",
-      //     "border-bottom": "solid 3px #fffacc"
-      //   });
-      // }else if(num < subScreensMass) {
-      //   $("#text_"+String(id)).css({
-      //     "background" : "white",
-      //     "border-top": "dashed 2px  #affaaf",
-      //     "border-bottom": "solid 3px #affaaf"
-      //   });
-      // }else if(num >= subScreensMass) {
-      //   $("#text_"+String(id)).css({
-      //     "width": "25px",
-      //     "text-align" : "center",
-      //     "background" : "white",
-      //     "border-bottom": "solid 3px #affaaf"
-      //   });
-      // }
       break;
     case "change":
       var textID = document.getElementById("text_"+String(id));
       textID.textContent = numberCSS(id, num)
-      // $("#text_"+String(id)).css({
-      //   "top": String(top+titleHeightSize)+"px",
-      //   "left":String(left)+"px"
-      // });
       break;
-    // case "remove":
-    //   if(MyID == id){
-    //     var placeholderID = ".video-placeholder"
-    //   }else{
-    //     var placeholderID = ".video-placeholder_"+String(id)
-    //   }
-    //   // $(placeholderID).css('border-top', '');
-    //   // $(placeholderID).css('border-left', '');
-    //   // $(placeholderID).css('border-right', '');
-    //   $("#text_"+String(id)).remove();
-    //   break;
     default:
       break;
   }
@@ -612,8 +559,9 @@ function stateMute(state, device, id){
     devices={"audio":"./image/muteAudio.png"}
     switch (state){
       case "make":
-        var num = ShiritoriOrder.indexOf(String(id))
-        muteAudioUsers.push(String(id));
+        var num = ShiritoriOrder.indexOf(String(id));
+        ShiritoriUsers[String(id)].mute = true;
+        //muteAudioUsers.push(String(id));
         /* Creating a mute display. */
         var div = document.createElement("div");
         div.id = "div_mute-"+device+"_"+String(id);
@@ -626,32 +574,36 @@ function stateMute(state, device, id){
         img.style.width = "25px";
         div.appendChild(img);
         resize = screenInfo(num);
+        if(num >= subScreensMass && num <= N){
+          var space_top = -25-25-5;
+          var space_left = +10+2;
+        }else{
+          var space_top = -25-25-5;
+          var space_left = +10+5;
+        }
         $("#div_mute-"+device+"_"+String(id)).css({
           "position": "absolute",
-          "top": String(resize.top*2+resize.height-25-35)+"px",
-          "left":String(resize.left*2+18)+"px",
+          "top": String(resize.top*2+resize.height+space_top)+"px",
+          "left":String(resize.left*2+space_left)+"px",
           "z-index": "5"
         });
         break;
       case "move":
-        if(muteAudioUsers.indexOf(String(id)) > -1){
+        //if(muteAudioUsers.indexOf(String(id)) > -1){
+        if(ShiritoriUsers[String(id)].mute == true){
           var num = ShiritoriOrder.indexOf(String(id))
           resize = screenInfo(num);
           $("#div_mute-"+device+"_"+String(id)).css({
-            "top": String(resize.top*2+resize.height-25-25)+"px",
-            "left":String(resize.left*2+10)+"px"
+            "top": String(resize.top*2+resize.height-25-35)+"px",
+            "left":String(resize.left*2+18)+"px"
           });
         }
         break;
       case "remove":
-        var num = muteAudioUsers.indexOf(String(id));
-        if(num > -1){
-          console.log("Remove user id : "+ id)
-          console.log(num)
-          $("#mute-"+device+"_"+String(id)).remove();
-          $("#div_mute-"+device+"_"+String(id)).remove();
-          muteAudioUsers.splice( num, 1 );
-        }
+        console.log("Remove user id : "+ id)
+        $("#mute-"+device+"_"+String(id)).remove();
+        $("#div_mute-"+device+"_"+String(id)).remove();
+        ShiritoriUsers[String(id)].mute = false;
         break;
       default:
         break;
@@ -756,17 +708,14 @@ function locateScreen(array, id){
 function moveScreen(users){
   /* array: User IDs are stored in the order of Shiritori. */
   Shiritori_Order(users);
-  /* Change the size of the main screen of the Shiritori screen. */
-  var id = ShiritoriOrder[0];
-  makeScreen(id, 0, "remove")
-  stateMute("move", "audio", id)
-  /* Change the size of the sub screen of the shiritori screen. */
-  for (i=1; i < ShiritoriOrder.length; i++){
+  /* Change the size of the screen of the shiritori screen. */
+  for (i=0; i < ShiritoriOrder.length; i++){
+    var id = ShiritoriOrder[i];
     stateMute("move", "audio", id)
     if(i+1 == ShiritoriOrder.length){
-      makeScreen(ShiritoriOrder[i], i, "make")
+      makeScreen(id, i, "make")
     }else{
-      makeScreen(ShiritoriOrder[i], i, "change")
+      makeScreen(id, i, "change")
     }
   }
 }
@@ -846,7 +795,11 @@ function memberInfo(users){
   var usersInfo = users.split("_");
   for(i=0; i < usersInfo.length; i++){
     var user = usersInfo[i].split(",");
-    ShiritoriUsers[user[1]] = user[0];
+    var info ={};
+    info.name = user[0];
+    info.mute = false;
+    ShiritoriUsers[user[1]] = info;
+    //ShiritoriUsersuser[0];
   }
   return i;
 }
@@ -872,12 +825,13 @@ function js_Leave(channel, uid, cameraResolution){
     if(MyID == uid){
       leave(rtc)
       for(i=0; i < ShiritoriOrder.length; i++){
-        //operationNumber("remove", ShiritoriOrder[i]);
-        removeDesign(ShiritoriOrder[i]);
+        var id = ShiritoriOrder[i];
+        removeDesign(id);
+        stateMute("remove", "audio", id);
       }
-      for(i=0; i < muteAudioUsers.length; i++){
-        stateMute("remove", "audio", muteAudioUsers[i])
-      }
+      // for(i=0; i < muteAudioUsers.length; i++){
+      //   stateMute("remove", "audio", muteAudioUsers[0])
+      // }
       operationTelop("remove")
     }else{
       console.error("My ID and leave id do not match.")
@@ -886,23 +840,15 @@ function js_Leave(channel, uid, cameraResolution){
 }
 
 function js_muteAudio(){
-  console.log("muteAudioUsers:"+muteAudioUsers)
-  if(muteAudioUsers.indexOf(String(MyID)) == -1){
-    stateMute("make", "audio", MyID)
+  if(ShiritoriUsers[String(MyID)].mute == false){
     rtc.localStream.muteAudio();
-  }else{
-    console.error("It's already muted.")
+    stateMute("make", "audio", MyID);
   }
-  console.log("muteAudioUsers:"+muteAudioUsers)
 }
 
 function js_unmuteAudio(){
-  console.log("muteAudioUsers:"+muteAudioUsers)
-  if(muteAudioUsers.indexOf(String(MyID)) > -1){
-    stateMute("remove", "audio", MyID)
+  if(ShiritoriUsers[String(MyID)].mute == true){
     rtc.localStream.unmuteAudio();
-  }else{
-    console.error("Unmute failed because it is not muted.")
+    stateMute("remove", "audio", MyID);
   }
-  console.log("muteAudioUsers:"+muteAudioUsers)
 }

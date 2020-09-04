@@ -10,7 +10,7 @@ public class leaveButton : MonoBehaviour
     public void OnClick()
     {
         int channel = 125;
-        string uid = "120";
+        string uid = "400";
         string camera = "default";
 
         agora a = new agora();
