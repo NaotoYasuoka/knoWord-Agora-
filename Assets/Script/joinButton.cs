@@ -22,6 +22,6 @@ public class joinButton : MonoBehaviour
 
         agora a = new agora();
         a.join(channel, uid, camera, member);
-    }
 
+    }
 }

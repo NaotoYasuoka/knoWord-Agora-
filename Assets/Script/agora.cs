@@ -13,38 +13,55 @@ public class agora
     [DllImport("__Internal")] private static extern void Move(string users);
 
 
+    /// <summary>
+    /// 特定のユーザーを会議に参加させる。
+    /// </summary>
+    /// <param name="channel">入室したいRoomID</param>
+    /// <param name="uid">入室するユーザー</param>
+    /// <param name="camera">
+    /// "default", "480p", "720p", "1080p"の中から選択
+    /// </param>
+    /// <param name="users"> しりとりに参加しているユーザー情報("name,id_name2,id2_..."という形式)</param>
     public void join(int channel, string uid, string camera, string users)
     {
-        /* Join the user to the meeting room.
-         * [int] channel: Room id (The same RoomID cannot exist.)
-         * [string] uid : ID for the user to enter the meeting.(The same ID cannot exist in the same room.)
-         * [string] camera : Camera Resolution.(Choose from : "default", "480p", "720p", "1080p")
-         * [string] users  : People who attend the meeting.(Form of "name,id_name2,id2_...") 
-         */
         Join(channel, uid, camera, users);
     }
 
+    /// <summary>
+    /// 特定のユーザーを会議から退室させる。
+    /// </summary>
+    /// <param name="channel">退室したいRoomID</param>
+    /// <param name="uid">退室するユーザー</param>
+    /// <param name="camera">
+    /// "default", "480p", "720p", "1080p"の中から選択
+    /// </param>
     public void leave(int channel, string uid, string camera)
     {
-        /* Leaving the meeting room. */
+        /// Leaving the meeting room. 
         Leave(channel, uid, camera);
     }
 
+    /// <summary>
+    /// 特定のユーザーをミュートにする。
+    /// </summary>
     public void mute()
     {
-        /* Mute Audio */
         Mute();
     }
 
+    /// <summary>
+    /// 特定のユーザーのミュートを解除する。
+    /// </summary>
     public void unmute()
     {
-        /* UnMute Audio */
         Unmute();
     }
-
+    /// <summary>
+    /// しりとり順に沿って、画面を移動させる。
+    /// </summary>
+    /// <param name="users">　しりとりに参加しているユーザー情報("name,id_name2,id2_..."という形式)　</param>
     public void move(string users)
     {
-        /* Screen switching (Move screen) */
         Move(users);
     }
 }
