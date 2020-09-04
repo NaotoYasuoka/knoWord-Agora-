@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ValueButton : MonoBehaviour
+public class MoveButton : MonoBehaviour
 {
 
     public void OnClick()
