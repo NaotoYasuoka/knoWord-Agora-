@@ -7,6 +7,10 @@
  * Copyright 2014-2017 Materialize
  * MIT License (https://raw.githubusercontent.com/Dogfalo/materialize/master/LICENSE)
  */
+.circle-screen{
+  border-radius: 50%;
+}
+
 .materialize-red {
   background-color: #e51c23 !important;
 }
@@ -9163,6 +9167,7 @@ html, body {
 /* .agora-theme .video-placeholder, */
 .agora-theme #local_stream, .agora-theme #local_video_info {
   position: absolute; top: 0;
+  border-radius: "50%";
   width: 480px;
   height: 320px; }
 
@@ -9179,6 +9184,7 @@ html, body {
   font-size: 10px; }
 
 .agora-theme .video-grid {
+  border-radius: 50%;
   display: grid;
   grid-gap: 20px;
   grid-template-columns: repeat(2, auto);

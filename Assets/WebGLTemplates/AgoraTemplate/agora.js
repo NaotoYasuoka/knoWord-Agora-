@@ -1,6 +1,6 @@
 /* Maximum room size is 17 people.
    In English Shiritori, the maximum number of people in a room is 10. (value N) */
-const N = 10;
+const N = 8;
 if(N > 17){
   console.error("The number of users of Agora.io is exceeded. Automatic change from "+N+" to 10.")
   N = 10
@@ -10,7 +10,11 @@ const subScreens = N-1;
 /* subScreensMass : The number of large chunks on the subscreen. */
 const subScreensMass = subScreens - 4 + 1;
 /* titleHeightSize : Title display height setting for "しりとり待ち". */
-const titleHeightSize = 30;
+const titleHeightSize = 42;
+const bottomSpace = 10;
+const rightSpace = 23;
+const miniMain_rightSpace = 0.337;
+const miniMain_bottomSpace = 0.275;
 /* MyID : storing your ID. */
 let MyID;
 /* widthSize, heightSize : Holds the width and height of the Unity screen. */
@@ -41,6 +45,7 @@ var resolutions = [
     value: "1080p"
   }
 ]
+
 
 function Toastify (options) {
   M.toast({html: options.text, classes: options.classes})
@@ -200,6 +205,7 @@ function handleEvents (rtc) {
       removeView(id)
       //operationNumber("remove", id)
       removeDesign(id);
+      stateMute("remove", "audio", id)
     }
     Toast.notice("peer leave")
     console.log("peer-leave", id)
@@ -495,7 +501,7 @@ function numberCSS(id, num){
   }
 
   var text = String(number)+" | "+ShiritoriUsers[String(id)].name;
-  resize = screenInfo(num);
+  resize = screenInfo(num, id);
   $("#text_"+String(id)).css({
     "position": "absolute",
     "z-index": "2",
@@ -573,7 +579,7 @@ function stateMute(state, device, id){
         img.style.height = "25px";
         img.style.width = "25px";
         div.appendChild(img);
-        resize = screenInfo(num);
+        resize = screenInfo(num, id);
         if(num >= subScreensMass && num <= N){
           var space_top = -25-25-5;
           var space_left = +10+2;
@@ -592,7 +598,7 @@ function stateMute(state, device, id){
         //if(muteAudioUsers.indexOf(String(id)) > -1){
         if(ShiritoriUsers[String(id)].mute == true){
           var num = ShiritoriOrder.indexOf(String(id))
-          resize = screenInfo(num);
+          resize = screenInfo(num, id);
           $("#div_mute-"+device+"_"+String(id)).css({
             "top": String(resize.top*2+resize.height-25-35)+"px",
             "left":String(resize.left*2+18)+"px"
@@ -614,42 +620,49 @@ function stateMute(state, device, id){
 }
 
 
-function screenInfo(num){
+function screenInfo(num, id=""){
   if(num > 10){
     console.error("The maximum number of people is exceeded. To change it, change the value of N.")
   }
   /* Change the size of the sub screen according to the screen size. */
-  var subScreenHeight = (heightSize-titleHeightSize) / subScreensMass;
+  var subScreenHeight = (heightSize-titleHeightSize-bottomSpace) / subScreensMass;
   var subScreenWidth =  3 * subScreenHeight / 2;
   /* Change the size of the main screen according to the screen size. */
-  var mainScreenWidth = widthSize * (5/8);
+  var mainScreenWidth = widthSize * (18/32);
   var mainScreenHeight = 2 * mainScreenWidth / 3;
 
   resize={width:null, height:null, top:null, left:null};
-  if(num == 0){
-    resize.width = mainScreenWidth;
-    resize.height = mainScreenHeight;
-    resize.top = heightSize / 32;
-    resize.left = widthSize * (3 / 32);
-  }else if(num < subScreensMass){
+  if(MyID == id && num == 0){
     resize.width = subScreenWidth;
     resize.height = subScreenHeight;
-    resize.top = (subScreenHeight / 2) * (num-1) + (titleHeightSize/2);
-    resize.left = (widthSize - subScreenWidth) / 2;
-  }else if(num >= subScreensMass){
-    resize.width = subScreenWidth / 2;
-    resize.height = subScreenHeight / 2;
-    if(num == subScreensMass || num == subScreensMass+1){
-      resize.top = (subScreenHeight / 2) * (subScreensMass-1) + (titleHeightSize/2) 
-    }else{
-      resize.top = (subScreenHeight / 2) * (subScreensMass-1+0.5) + (titleHeightSize/2) 
-    }
-    if(num % 2 == 0){
-      resize.left = (widthSize-subScreenWidth)/2;
-    }else{
-      resize.left = (widthSize-(subScreenWidth/2))/2;
-    }
-  }else {}
+    resize.top = (heightSize - subScreenHeight - heightSize * miniMain_bottomSpace) / 2 - bottomSpace;
+    resize.left = (widthSize - subScreenWidth - widthSize * miniMain_rightSpace) / 2 + bottomSpace*2.0;
+  }else{
+    if(num == 0){
+      resize.width = mainScreenWidth;
+      resize.height = mainScreenHeight;
+      resize.top = heightSize / 32-3;
+      resize.left = widthSize * (3 / 32)-50;
+    }else if(num < subScreensMass){
+      resize.width = subScreenWidth;
+      resize.height = subScreenHeight;
+      resize.top = (subScreenHeight / 2) * (num-1) + (titleHeightSize/2);
+      resize.left = (widthSize - subScreenWidth - rightSpace) / 2;
+    }else if(num >= subScreensMass){
+      resize.width = subScreenWidth / 2;
+      resize.height = subScreenHeight / 2;
+      if(num == subScreensMass || num == subScreensMass+1){
+        resize.top = (subScreenHeight / 2) * (subScreensMass-1) + (titleHeightSize/2) 
+      }else{
+        resize.top = (subScreenHeight / 2) * (subScreensMass-1+0.5) + (titleHeightSize/2) 
+      }
+      if(num % 2 == 0){
+        resize.left = (widthSize-subScreenWidth - rightSpace)/2;
+      }else{
+        resize.left = (widthSize-(subScreenWidth/2)-rightSpace)/2;
+      }
+    }else {}
+  }
   return resize;
 }
 
@@ -664,14 +677,15 @@ function makeScreen(id, num, state=""){
     var viewID = ".video-view_"+String(id)
     var placeholderID = ".video-placeholder_"+String(id)
   }
-  resize = screenInfo(num);
+  resize = screenInfo(num, id);
   $(viewID+","+placeholderID).css({
     "position": "absolute",
     "z-index": "1",
+    "border-radius": "50%",
     "top": String(resize.top)+"px",
     "left":String(resize.left)+"px",
-    "width": String(resize.width)+"px",
-    "height": String(resize.height)+"px"
+    "width": "80px", //String(resize.width)+"px",
+    "height": "80px" //String(resize.height)+"px"
   });
   operationNumber(state, id, num)
 
@@ -758,33 +772,38 @@ function js_Join(channel, uid, cameraResolution, users){
           L Choose from : "default", "480p", "720p", "1080p"
     users : Obtaining the order of shiritori.(array (※uid is stored.) )
   */
+ /* "KOU,2_YAMADA,3_TANAKA,4_KAMINO,5_NOMA,6_MAKABE,7_BEKA,8_YASU,1" */
+ //users = "KOU,2_YAMADA,3_TANAKA,4_KAMINO,5_NOMA,6_MAKABE,7_BEKA,8_YASU,1";
+ //users="KOU,2_YASU,1"
   console.log("join")
+  console.log("About arguments:", channel, String(uid), String(cameraResolution), String(users));
   var user = users;
-  var memberNum = memberInfo(String(user));
-  if(memberNum <= N){
-    console.log("About arguments: channel:"+channel+"uid:"+uid+"cameraResolution:"+cameraResolution);
-    Shiritori_Order(String(user));
-    var appid = classificateAppID(channel)
-    var params = serializeformData(String(appid), String(channel), String(uid), String(cameraResolution)); 
-    /* Acquisition of Unity screen size. */
-    $(function() {
-      var s = $('#gameContainer');
-      widthSize = s.width()
-      heightSize = s.height()
-    });
-    if (validator(params, fields)) {
-      console.log(ShiritoriUsers)
-      console.log(ShiritoriOrder)
-      join(rtc, params).then(function(r){
-        console.log(r)
-        locateScreen(ShiritoriOrder, MyID)
-        operationTelop("make")
-      }).catch(function (e){
-        alert(e);
+  if(ShiritoriUsers[String(uid)] == null){
+    var memberNum = memberInfo(String(user));
+    if(memberNum <= N){
+      Shiritori_Order(String(user));
+      var appid = classificateAppID(channel)
+      var params = serializeformData(String(appid), String(channel), String(uid), String(cameraResolution)); 
+      /* Acquisition of Unity screen size. */
+      $(function() {
+        var s = $('#gameContainer');
+        widthSize = s.width()
+        heightSize = s.height()
       });
+      if (validator(params, fields)) {
+        console.log(ShiritoriUsers)
+        console.log(ShiritoriOrder)
+        join(rtc, params).then(function(r){
+          console.log(r)
+          locateScreen(ShiritoriOrder, MyID)
+          //operationTelop("make")
+        }).catch(function (e){
+          alert(e);
+        });
+      }
+    }else{
+      console.error()
     }
-  }else{
-    console.error()
   }
 }
 
@@ -820,21 +839,23 @@ function js_Leave(channel, uid, cameraResolution){
   console.log("leave")
   var appid = classificateAppID(channel)
   var params = serializeformData(String(appid), String(channel), String(uid), String(cameraResolution))
-  console.log("parse: "+rtc)
-  if (validator(params, fields)) {
-    if(MyID == uid){
-      leave(rtc)
-      for(i=0; i < ShiritoriOrder.length; i++){
-        var id = ShiritoriOrder[i];
-        removeDesign(id);
-        stateMute("remove", "audio", id);
+  if(ShiritoriUsers[String(uid)] != null){
+    if (validator(params, fields)) {
+      if(MyID == uid){
+        console.log("leave")
+        leave(rtc)
+        for(i=0; i < ShiritoriOrder.length; i++){
+          var id = ShiritoriOrder[i];
+          removeDesign(id);
+          stateMute("remove", "audio", id);
+        }
+        // for(i=0; i < muteAudioUsers.length; i++){
+        //   stateMute("remove", "audio", muteAudioUsers[0])
+        // }
+        //operationTelop("remove")
+      }else{
+        console.error("My ID and leave id do not match.")
       }
-      // for(i=0; i < muteAudioUsers.length; i++){
-      //   stateMute("remove", "audio", muteAudioUsers[0])
-      // }
-      operationTelop("remove")
-    }else{
-      console.error("My ID and leave id do not match.")
     }
   }
 }

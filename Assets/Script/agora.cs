@@ -24,6 +24,8 @@ public class agora
     /// <param name="users"> しりとりに参加しているユーザー情報("name,id_name2,id2_..."という形式)</param>
     public void join(int channel, string uid, string camera, string users)
     {
+        users = "tanaka,1";
+        uid = "1";
         Join(channel, uid, camera, users);
     }
 
@@ -37,6 +39,7 @@ public class agora
     /// </param>
     public void leave(int channel, string uid, string camera)
     {
+        uid = "1";
         /// Leaving the meeting room. 
         Leave(channel, uid, camera);
     }
